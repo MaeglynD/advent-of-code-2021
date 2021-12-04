@@ -7,7 +7,7 @@ using namespace std;
 int main () {
 	ifstream input;
 	string line;
-	input.open("inputs/1.txt");
+	input.open("../inputs/1.txt");
 
 	vector<int> vec;
 	int current, count = 0, acc = 0;

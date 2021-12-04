@@ -8,7 +8,7 @@ int main () {
 	ifstream input;
 	string line;
 	
-	input.open("inputs/1.txt");
+	input.open("../inputs/1.txt");
 
 	while(getline(input, line)) {
 		current = stoi(line);
