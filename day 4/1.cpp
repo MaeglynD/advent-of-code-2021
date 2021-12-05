@@ -67,28 +67,17 @@ int main () {
 					
 					// If its possible to achieve bingo...
 					if (num_i > 3) {
-						// Check the row for bingo
-						if (all_of(row.begin(), row.end(), [](int num){ return num == - 1; })) {
+						// Check for bingo
+						if (
+							// Check rows...
+							all_of(row.begin(), row.end(), [](int num){ return num == - 1; }) ||
+							// Check cols...
+							all_of(board.begin(), board.end(), [foundIndex](auto vec) { return vec[foundIndex] == -1; })
+						) {
 							winningBingoNumber = bingoNum;
 							correctBoard = board_i;
 
 							goto BINGO;
-						}
-
-						// Check the columns for bingo
-						for (int i = 0; i < row.size(); ++i) {
-							int col = board[i][foundIndex];
-
-							if (col != -1) {
-								break;
-							}
-
-							if (i == row.size() -1) {
-								winningBingoNumber = bingoNum;
-								correctBoard = board_i;
-
-								goto BINGO;
-							}
 						}
 					}
 				}
@@ -98,7 +87,7 @@ int main () {
 
 	BINGO:
 		vector<vector<int>> &board = boards[correctBoard];
-		int total, multiplier = board.size();
+		int total = 0, multiplier = board.size();
 
 		// Loop through the matrix, add all unmarked values
 		for (int i = 0; i < multiplier * multiplier; ++i) {
