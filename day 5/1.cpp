@@ -6,15 +6,6 @@
 #include <algorithm>
 using namespace std;
 
-void logHeatmap(vector<vector<int>>&heatmap) {
-	for(int i =0; i < heatmap.size(); i++) {
-		for (int x =0; x < heatmap[i].size(); x++){
-			cout << heatmap[i][x] << " ";
-		}
-		cout << endl;
-	}
-}
-
 void updateHeatmapSize(vector<vector<int>> &heatmap, size_t &size) {
 	for (vector<int> &row : heatmap) {
 		row.resize(size);
@@ -54,7 +45,7 @@ int main () {
 			// Get diagonals outta here.
 			if (x1 != x2 && y1 != y2) continue;
 
-			size_t maxCoordSize = max({ x1, x2, y1, y2 });
+			size_t maxCoordSize = max({ x1, x2, y1, y2 }) + 1;
 
 			// If the biggest coordinate is larger than the dimension of
 			// the heatmap, update the heatmaps size accordingly
@@ -73,19 +64,14 @@ int main () {
 				finish = max(x1, x2);
 			}
 
-			cout << start << " " << finish << endl;
-			cout << isYIncreasing;
-
 			for (size_t i = start; i <= finish; ++i) {
 				int* coord = isYIncreasing ? &heatmap[i][x1] : &heatmap[y1][i];
-				*coord++;
+				(*coord)++;
 
 				if (*coord == 2) overlapCount++;
 			}
 		}
 	}
-
-	logHeatmap(heatmap);
 
 	cout << "Overlap count: " << overlapCount;
 
