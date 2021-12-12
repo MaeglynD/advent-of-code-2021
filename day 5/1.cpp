@@ -4,7 +4,12 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <cstdlib>
 using namespace std;
+
+struct Point {
+	int x, y;
+};
 
 void updateHeatmapSize(vector<vector<int>> &heatmap, size_t &size) {
 	for (vector<int> &row : heatmap) {
@@ -14,10 +19,19 @@ void updateHeatmapSize(vector<vector<int>> &heatmap, size_t &size) {
 	heatmap.resize(size, vector<int>(size));
 }
 
+void markPoint(int *coord, int &overlapCount) {
+	(*coord)++;
+
+	if (*coord == 2) {
+		overlapCount++;
+	}
+}
+
 
 int main () {
 	int overlapCount = 0;
 	vector<vector<int>> heatmap;
+	int test = 0;
 
 	ifstream input;
 	string line;
@@ -34,41 +48,37 @@ int main () {
 			size_t delimA = posA.find(',');
 			size_t delimB = posB.find(',');
 
-			size_t x1, x2, y1, y2;
+			Point a = { stoi(posA.substr(0, delimA)), stoi(posA.substr(delimA + 1)) };
+			Point b = { stoi(posB.substr(0, delimB)), stoi(posB.substr(delimB + 1)) };
 
-			x1 = stoi(posA.substr(0, delimA));
-			y1 = stoi(posA.substr(delimA + 1));
-
-			x2 = stoi(posB.substr(0, delimB));
-			y2 = stoi(posB.substr(delimB + 1));
-
-			// Get diagonals outta here.
-			if (x1 != x2 && y1 != y2) continue;
-
-			size_t maxCoordSize = max({ x1, x2, y1, y2 }) + 1;
+			size_t maxCoordSize = max({ a.x, b.x, a.y, b.y }) + 1;
 
 			// If the biggest coordinate is larger than the dimension of
 			// the heatmap, update the heatmaps size accordingly
 			if (maxCoordSize > heatmap.size()) {
 				updateHeatmapSize(heatmap, maxCoordSize);
+				
 			}
 
-			size_t start, finish;
-			bool isYIncreasing = x1 == x2;
+			// Differences between the two points
+			size_t xDiff = abs(a.x - b.x);
+			size_t yDiff = abs(a.y - b.y);
+
+			size_t baseX = max(a.x, b.x);
+			size_t baseY = max(a.y, b.y);
+
+			// If its a horizontal line
+			if (xDiff == 0) {
+				for (int i = yDiff; i >= 0; --i) {
+					markPoint(&heatmap[baseY - i][a.x], overlapCount);
+				}
+			} 
 			
-			if (isYIncreasing) {
-				start = min(y1, y2);
-				finish = max(y1, y2);
-			} else {
-				start = min(x1, x2);
-				finish = max(x1, x2);
-			}
-
-			for (size_t i = start; i <= finish; ++i) {
-				int* coord = isYIncreasing ? &heatmap[i][x1] : &heatmap[y1][i];
-				(*coord)++;
-
-				if (*coord == 2) overlapCount++;
+			// If its a vertical line
+			else if (yDiff == 0) {
+				for (int i = xDiff; i >= 0; --i) {
+					markPoint(&heatmap[a.y][baseX - i], overlapCount);
+				}
 			}
 		}
 	}
