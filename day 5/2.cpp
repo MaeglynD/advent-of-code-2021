@@ -4,105 +4,100 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <cstdlib>
 using namespace std;
 
-struct BingoResult {
-	vector<vector<int>> board;
-	int winningNumber;
+struct Point {
+	int x, y;
 };
 
+void updateHeatmapSize(vector<vector<int>> &heatmap, size_t &size) {
+	for (vector<int> &row : heatmap) {
+		row.resize(size);
+	}
+
+	heatmap.resize(size, vector<int>(size));
+}
+
+void markPoint(int *coord, int &overlapCount) {
+	(*coord)++;
+
+	if (*coord == 2) {
+		overlapCount++;
+	}
+}
+
+
 int main () {
-	istringstream strStream;
+	int overlapCount = 0;
+	vector<vector<int>> heatmap;
+	int test = 0;
+
 	ifstream input;
 	string line;
-	BingoResult lastWinningBoard;
-
-	vector<int> bingoNumbers;
-	vector<vector<vector<int>>> boards;
 	
-	input.open("../inputs/4.txt");
+	input.open("../inputs/5.txt");
 
-	// The first line holds a comma delimitated list of numbers
-	getline(input, line);
-	strStream.str(line);
-	
-	// Parse the bingo numbers
-	while(getline(strStream, line, ',')) {
-		bingoNumbers.push_back(stoi(line));
-	}
-
-	// Parse the bingo boards
 	while (getline(input, line)) {
-		if (!line.size()) {
-			boards.push_back({});
-		} else {
-			int boardsUpperIndex, boardUpperIndex, num;
-			
-			boardsUpperIndex = boards.size() - 1;
-			boards[boardsUpperIndex].push_back({});
+		size_t delimPos = line.find(' ');
 
-			boardUpperIndex = boards[boardsUpperIndex].size() - 1;
+		if (delimPos != string::npos) {
+			string posA = line.substr(0, delimPos);
+			string posB = line.substr(delimPos + 4);
 
-			strStream.clear();
-			strStream.str(line);
+			size_t delimA = posA.find(',');
+			size_t delimB = posB.find(',');
 
-			while (strStream >> num) {
-				boards[boardsUpperIndex][boardUpperIndex].push_back(num);
+			Point a = { stoi(posA.substr(0, delimA)), stoi(posA.substr(delimA + 1)) };
+			Point b = { stoi(posB.substr(0, delimB)), stoi(posB.substr(delimB + 1)) };
+
+			size_t maxCoordSize = max({ a.x, b.x, a.y, b.y }) + 1;
+
+			// If the biggest coordinate is larger than the dimension of
+			// the heatmap, update the heatmaps size accordingly
+			if (maxCoordSize > heatmap.size()) {
+				updateHeatmapSize(heatmap, maxCoordSize);
+				
 			}
-		}
-	}
 
-	// For every number that will be called...
-	for (int num_i = 0; num_i < bingoNumbers.size(); ++num_i) {
-		int bingoNum = bingoNumbers[num_i];
+			// Differences between the two points
+			size_t xDiff = abs(a.x - b.x);
+			size_t yDiff = abs(a.y - b.y);
 
-		// For every possible board....
-		for (int board_i = 0; boards.size() && board_i < boards.size(); ++board_i) {
-			vector<vector<int>> &board = boards[board_i];
+			size_t baseX = max(a.x, b.x);
+			size_t baseY = max(a.y, b.y);
 
-			// For every row in the board...
-			for (int row_i = 0; row_i < board.size(); ++row_i) {
-				vector<int> &row = board[row_i];
-				auto it = find(row.begin(), row.end(), bingoNum);
+			// If its a horizontal line
+			if (xDiff == 0) {
+				for (int i = yDiff; i >= 0; --i) {
+					markPoint(&heatmap[baseY - i][a.x], overlapCount);
+				}
+			} 
+			
+			// If its a vertical line
+			else if (yDiff == 0) {
+				for (int i = xDiff; i >= 0; --i) {
+					markPoint(&heatmap[a.y][baseX - i], overlapCount);
+				}
+			} 
+			
+			// If its a diagonal line
+			else if (xDiff == yDiff) {
+				if (a.x > b.x) swap(a, b);
 
-				if (it != row.end()) {
-					int foundIndex = it - row.begin();
+				bool isYIncreasing = a.y < b.y;
 
-					row[foundIndex] = -1;
-					
-					// If its possible to achieve bingo...
-					if (num_i > 3) {
-						// Check for bingo
-						if (
-							// Check rows...
-							all_of(row.begin(), row.end(), [](int num){ return num == - 1; }) ||
-							// Check cols...
-							all_of(board.begin(), board.end(), [foundIndex](auto vec) { return vec[foundIndex] == -1; })
-						) {
-							lastWinningBoard = { boards[board_i], bingoNum };
-							boards.erase(boards.begin() + board_i);
-							board_i--;
+				for (int i = xDiff; i >= 0; --i) {
+					markPoint(&heatmap[a.y][a.x], overlapCount);
 
-							break;
-						}
-					}
+					isYIncreasing ? a.y++ : a.y--;
+					a.x++;
 				}
 			}
 		}
 	}
 
-	// Loop through the matrix, add all unmarked values
-	int total = 0, multiplier = lastWinningBoard.board.size();
-	
-	for (int i = 0; i < multiplier * multiplier; ++i) {
-		int val = lastWinningBoard.board[i / multiplier][i % multiplier];
+	cout << "Overlap count: " << overlapCount;
 
-		if (val != -1) {
-			total += val;
-		}
-	}
-	
-	cout << "test " << total * lastWinningBoard.winningNumber;
-	
 	return 0;
 }
