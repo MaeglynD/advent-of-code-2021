@@ -5,13 +5,18 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdlib>
-#include <numeric>
 using namespace std;
-typedef long long ll;
 
+int getDescendants(int days, int age){
+	int futureDays = days - (age + 1);
+
+	return futureDays >= 0
+		? 1 + getDescendants(futureDays, 6) + getDescendants(futureDays, 8)
+		: 0;
+}
 
 int main () {
-	ll total = 0;
+	size_t total = 0;
 	size_t days = 256;
 	vector<int> colony;
 
@@ -23,20 +28,7 @@ int main () {
 	}
 
 	for (int &fish : colony) {
-		vector<ll> state(9, 0);
-
-		state[fish] = 1;
-
-		for (int i = 0; i < days; ++i) {
-			ll births = state[0];
-
-			state.erase(state.begin());
-			state.push_back(births);
-
-			state[6] += births;
-		}
-		
-		total += accumulate(state.begin(), state.end(), 0LL);
+		total += (1 + getDescendants(days, fish));
 	}
 
 	cout << total;
