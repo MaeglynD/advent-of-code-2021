@@ -22,6 +22,13 @@ void findPaths(vector<string> path) {
 	}
 }
 
+void addToCipher(string& a, string& b) {
+	if (cipher.find(a) == cipher.end())
+		cipher.insert({ a, { b }});
+	else
+		cipher[a].insert(b);
+}
+
 int main () {
 	ifstream input("../inputs/12.txt");
 	string line;
@@ -31,15 +38,9 @@ int main () {
 		string a = line.substr(0, delimPos);
 		string b = line.substr(delimPos + 1);
 
-		if (cipher.find(a) == cipher.end()) 
-			cipher.insert({ a, { b }});
-		else 
-			cipher[a].insert(b);
-		
-		if (cipher.find(b) == cipher.end()) 
-			cipher.insert({ b, { a }});
-		else 
-			cipher[b].insert(a);
+		addToCipher(a, b);
+		swap(a, b);
+		addToCipher(a, b);
 	}
 
 	findPaths({ "start" });
