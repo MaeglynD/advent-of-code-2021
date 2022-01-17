@@ -12,7 +12,7 @@ void foldX(int fp, vector<vector<bool>>& matrix) {
 
 	for (int row = 0; row < ys; ++row) {
 		for (int i = 0; i < fxs + 1; ++i) {
-			if ( (i <= fp && matrix[row][fp -i]) || (i < xs - fp && matrix[row][fp + i]))
+			if ((i <= fp && matrix[row][fp -i]) || (i < xs - fp && matrix[row][fp + i]))
 				foldedMatrix[row][fxs -i] = true;
 		}
 	}
