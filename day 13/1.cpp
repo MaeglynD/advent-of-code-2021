@@ -5,23 +5,19 @@ void foldY(int foldIndex, vector<vector<bool>>& matrix) {
 	// 
 }
 
-void foldX(int foldIndex, vector<vector<bool>>& matrix) {
-	int xSize = matrix[0].size();
-	int ySize = matrix.size();
-	int foldedXSize = max(foldIndex, xSize - 1 - foldIndex);
+void foldX(int fp, vector<vector<bool>>& matrix) {
+	int xs = matrix[0].size();
+	int ys = matrix.size();
+	int fxs = max(fp +1, xs - fp);
+	vector<vector<bool>>foldedMatrix(ys, vector<bool>(fxs));
 
-	vector<vector<bool>>foldedMatrix(ySize, vector<bool>(foldedXSize));
-
-	for (int row = 0; row < ySize; ++row) {
-		// Right side
-		for (int col = 0; col < foldedXSize; ++col)
-			if (matrix[row][xSize -1 -col])
-				foldedMatrix[row][col] = true;
-
-		// Lef side
-		for (int i = 0; i < foldIndex; ++i) 
-			if (matrix[row][i])
-				foldedMatrix[row][foldIndex < foldedXSize ? (foldedXSize - foldIndex) + i : i] = true;
+	for (int row = 0; row < ys; ++row) {
+		for (int i = 0; i < fxs; ++i) {
+			// bringing the left side to the new matrix
+			if (i <= fp && matrix[row][fp -i]) foldedMatrix[row][fxs -1 -i] = true;
+			// bringing the right side to the new matrix
+			if (i < xs - fp && matrix[row][fp + i]) foldedMatrix[row][fxs -1 -i] = true;
+		}
 	}
 
 	matrix = foldedMatrix;
