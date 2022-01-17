@@ -54,9 +54,8 @@ int main () {
 			markedPositions.push_back({ x, y });
 		}
 
-		if (equalsDelim != string::npos) {
+		if (equalsDelim != string::npos)
 			foldingInstructions.push_back({ line[equalsDelim -1], stoi(line.substr(equalsDelim +1)) });
-		}
 	}
 
 	matrix.resize(ySize, vector<bool>(xSize));
