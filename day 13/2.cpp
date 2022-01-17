@@ -1,8 +1,19 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-void foldY(int foldIndex, vector<vector<bool>>& matrix) {
-	// 
+void foldY(int fp, vector<vector<bool>>& matrix) {
+	int xs = matrix[0].size(), ys = matrix.size();
+	int fys = max(fp +1, ys - fp) -1;
+	vector<vector<bool>>foldedMatrix(fys, vector<bool>(xs));
+
+	for (int i = 0; i < ys + 1; ++i) {
+		for (int col = 0; col < xs; ++col) {
+			if ((i <= fp && matrix[fp -i][col]) || (i < ys - fp && matrix[fp + i][col]))
+				foldedMatrix[fys -i][col] = true;
+		}
+	}
+
+	matrix = foldedMatrix;
 }
 
 void foldX(int fp, vector<vector<bool>>& matrix) {
@@ -45,7 +56,6 @@ int main () {
 
 		if (equalsDelim != string::npos) {
 			foldingInstructions.push_back({ line[equalsDelim -1], stoi(line.substr(equalsDelim +1)) });
-			break;
 		}
 	}
 
@@ -61,10 +71,12 @@ int main () {
 			foldX(index, matrix);
 	}
 
-	for (auto& row : matrix) 
-		total += count(row.begin(), row.end(), true);
-
-	cout << total;
+	for (auto& row : matrix) {
+		for (auto col : row) 
+			cout << (col ? (char)254u : ' ') << " ";
+		
+		cout << endl;
+	}
 	
 	return 0;
 }
