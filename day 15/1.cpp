@@ -27,9 +27,7 @@ int main () {
 		matrix.push_back({});
 		
 		for (int i = 0; i < line.size(); ++i) {
-			pair<int, int> pos = { matrix.size() - 1, i };
-
-			matrix.back().push_back({ line[i] -48, pos });
+			matrix.back().push_back({ line[i] -48, { matrix.size() - 1, i }});
 		}
 	}
 
