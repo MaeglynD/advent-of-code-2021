@@ -42,9 +42,9 @@ void parseNextPacket() {
 			if (binary.size() < 15) {
 				binary = "";
 			} else {
-				int prevBinarySize = binary.size();
-
 				result = binaryToInt(takeFromBinary(15));
+
+				int prevBinarySize = binary.size();
 
 				while(prevBinarySize - binary.size() < result)
 					parseNextPacket();
