@@ -67,8 +67,7 @@ int main () {
 	for (char& hexChar : hexInput)
 		binary += hexToBinary(hexChar);
 
-	while(binary.size() > 6)
-		parseNextPacket();
+	parseNextPacket();
 
 	cout << versionTotal;
 	
